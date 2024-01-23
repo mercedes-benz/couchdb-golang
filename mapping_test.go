@@ -259,7 +259,7 @@ func TestCompareDocWithObj(t *testing.T) {
 			{"author": "Joe", "content": "Hey"},
 		},
 	}
-	err := mappingDB.Set("test", postDoc)
+	err := mappingDB.Set("test", postDoc, nil)
 	if err != nil {
 		t.Fatal("db set error", err)
 	}
@@ -290,7 +290,7 @@ func compareFloat(x, y float64) int {
 }
 
 func TestSliceFieldFloat(t *testing.T) {
-	err := mappingDB.Set("float", map[string]interface{}{"numbers": []float64{1.0, 2.0}})
+	err := mappingDB.Set("float", map[string]interface{}{"numbers": []float64{1.0, 2.0}}, nil)
 	if err != nil {
 		t.Fatal("db set error", err)
 	}

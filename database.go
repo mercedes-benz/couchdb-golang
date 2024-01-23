@@ -184,9 +184,13 @@ func deleteDoc(docRes *Resource, rev string) error {
 }
 
 // Set creates or updates a document with the specified ID.
-func (d *Database) Set(docid string, doc map[string]interface{}) error {
+func (d *Database) Set(docid string, doc map[string]interface{}, params map[string]string) error {
 	docRes := docResource(d.resource, docid)
-	_, data, err := docRes.PutJSON("", nil, doc, nil)
+	urlParams := url.Values{}
+	for k, v := range params {
+		urlParams.Set(k, v)
+	}
+	_, data, err := docRes.PutJSON("", nil, doc, urlParams)
 	if err != nil {
 		return err
 	}
@@ -654,7 +658,7 @@ func (d *Database) Cleanup() error {
 // index: Instruct a query to use a specific index, specified either as "<design_document>" or
 // ["<design_document>", "<index_name>"], passing nil to use primary index(_all_docs) by default.
 //
-// Inner functions for selector syntax
+// # Inner functions for selector syntax
 //
 // nor(condexprs...) matches if none of the conditions in condexprs match($nor).
 //
@@ -702,7 +706,7 @@ func (d *Database) Cleanup() error {
 //
 // For example: regex(title, "^A") returns all documents whose title is begin with an "A".
 //
-// Inner functions for sort syntax
+// # Inner functions for sort syntax
 //
 // asc(field) sorts the field in ascending order, this is the default option while
 // desc(field) sorts the field in descending order.

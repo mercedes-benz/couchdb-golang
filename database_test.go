@@ -169,7 +169,7 @@ func TestCreateLargeDoc(t *testing.T) {
 		buf.WriteString("0123456789")
 	}
 	doc := map[string]interface{}{"data": buf.String()}
-	if err := testsDB.Set("large", doc); err != nil {
+	if err := testsDB.Set("large", doc, nil); err != nil {
 		t.Error(`db set error`, err)
 	}
 	doc, err := testsDB.Get("large", nil)
@@ -187,7 +187,7 @@ func TestCreateLargeDoc(t *testing.T) {
 
 func TestDocIDQuoting(t *testing.T) {
 	doc := map[string]interface{}{"foo": "bar"}
-	err := testsDB.Set("foo/bar", doc)
+	err := testsDB.Set("foo/bar", doc, nil)
 	if err != nil {
 		t.Error(`db set error`, err)
 	}
@@ -210,7 +210,7 @@ func TestDocIDQuoting(t *testing.T) {
 
 func TestDisallowNaN(t *testing.T) {
 	doc := map[string]interface{}{"number": math.NaN()}
-	err := testsDB.Set("foo", doc)
+	err := testsDB.Set("foo", doc, nil)
 	if err == nil {
 		t.Error(`db set NaN ok`)
 	}
@@ -230,13 +230,13 @@ func TestDisallowNilID(t *testing.T) {
 func TestDocRevs(t *testing.T) {
 	uuid := GenerateUUID()
 	doc := map[string]interface{}{"bar": 42}
-	err := testsDB.Set(uuid, doc)
+	err := testsDB.Set(uuid, doc, nil)
 	if err != nil {
 		t.Error(`db set doc error`, err)
 	}
 	oldRev := doc["_rev"].(string)
 	doc["bar"] = 43
-	err = testsDB.Set(uuid, doc)
+	err = testsDB.Set(uuid, doc, nil)
 	if err != nil {
 		t.Error(`db set doc error`, err)
 	}
@@ -304,7 +304,7 @@ func TestDocRevs(t *testing.T) {
 func TestAttachmentCRUD(t *testing.T) {
 	uuid := GenerateUUID()
 	doc := map[string]interface{}{"bar": 42}
-	testsDB.Set(uuid, doc)
+	testsDB.Set(uuid, doc, nil)
 	oldRev := doc["_rev"].(string)
 
 	testsDB.PutAttachment(doc, []byte("Foo bar"), "foo.txt", "text/plain")
@@ -364,7 +364,7 @@ func TestAttachmentCRUD(t *testing.T) {
 func TestAttachmentWithFiles(t *testing.T) {
 	uuid := GenerateUUID()
 	doc := map[string]interface{}{"bar": 42}
-	err := testsDB.Set(uuid, doc)
+	err := testsDB.Set(uuid, doc, nil)
 	if err != nil {
 		t.Error(`db set doc error`, err)
 	}
@@ -454,7 +454,7 @@ func TestAttachmentCRUDFromFS(t *testing.T) {
 	}
 
 	doc := map[string]interface{}{"bar": 42}
-	err = testsDB.Set(uuid, doc)
+	err = testsDB.Set(uuid, doc, nil)
 	if err != nil {
 		t.Error(`db set doc error`, err)
 	}
@@ -517,7 +517,7 @@ func TestAttachmentCRUDFromFS(t *testing.T) {
 func TestEmptyAttachment(t *testing.T) {
 	uuid := GenerateUUID()
 	doc := map[string]interface{}{}
-	err := testsDB.Set(uuid, doc)
+	err := testsDB.Set(uuid, doc, nil)
 	if err != nil {
 		t.Error(`db set doc error`, err)
 	}
@@ -547,7 +547,7 @@ func TestEmptyAttachment(t *testing.T) {
 func TestDefaultAttachment(t *testing.T) {
 	uuid := GenerateUUID()
 	doc := map[string]interface{}{}
-	err := testsDB.Set(uuid, doc)
+	err := testsDB.Set(uuid, doc, nil)
 	if err != nil {
 		t.Error(`db set doc error`, err)
 	}
@@ -560,7 +560,7 @@ func TestDefaultAttachment(t *testing.T) {
 func TestAttachmentNoFilename(t *testing.T) {
 	uuid := GenerateUUID()
 	doc := map[string]interface{}{}
-	err := testsDB.Set(uuid, doc)
+	err := testsDB.Set(uuid, doc, nil)
 	if err != nil {
 		t.Error(`db set doc error`, err)
 	}
@@ -572,7 +572,7 @@ func TestAttachmentNoFilename(t *testing.T) {
 
 func TestJSONAttachment(t *testing.T) {
 	doc := map[string]interface{}{}
-	err := testsDB.Set(GenerateUUID(), doc)
+	err := testsDB.Set(GenerateUUID(), doc, nil)
 	if err != nil {
 		t.Error(`db set doc error`, err)
 	}
@@ -612,7 +612,7 @@ func TestBulkUpdateConflict(t *testing.T) {
 	for k, v := range docs[0] {
 		doc[k] = v
 	}
-	testsDB.Set(doc["_id"].(string), doc)
+	testsDB.Set(doc["_id"].(string), doc, nil)
 
 	results, err := testsDB.Update(docs, nil)
 	if err != nil {
@@ -624,8 +624,8 @@ func TestBulkUpdateConflict(t *testing.T) {
 }
 
 func TestCopyDocConflict(t *testing.T) {
-	testsDB.Set("foo1", map[string]interface{}{"status": "idle"})
-	testsDB.Set("bar1", map[string]interface{}{"status": "testing"})
+	testsDB.Set("foo1", map[string]interface{}{"status": "idle"}, nil)
+	testsDB.Set("bar1", map[string]interface{}{"status": "testing"}, nil)
 	_, err := testsDB.Copy("foo1", "bar1", "")
 	if err != ErrConflict {
 		t.Errorf(`db copy returns %v, want ErrConflict`, err)
@@ -635,8 +635,8 @@ func TestCopyDocConflict(t *testing.T) {
 func TestCopyDocOverwrite(t *testing.T) {
 	foo2 := map[string]interface{}{"status": "testing"}
 	bar2 := map[string]interface{}{"status": "idle"}
-	testsDB.Set("foo2", foo2)
-	testsDB.Set("bar2", bar2)
+	testsDB.Set("foo2", foo2, nil)
+	testsDB.Set("bar2", bar2, nil)
 	result, err := testsDB.Copy("foo2", "bar2", bar2["_rev"].(string))
 	if err != nil {
 		t.Error(`db copy error`, err)
@@ -668,7 +668,7 @@ func TestPurge(t *testing.T) {
 	// TODO: purge not implemented in CouchDB 2.0.0
 	if !strings.HasPrefix(version, "2") {
 		doc := map[string]interface{}{"a": "b"}
-		err := testsDB.Set("purge", doc)
+		err := testsDB.Set("purge", doc, nil)
 		if err != nil {
 			t.Error(`db set error`, err)
 		}
@@ -719,7 +719,7 @@ func TestDBSetGetDelete(t *testing.T) {
 		"type": "Person",
 		"name": "Jason Statham",
 	}
-	err := testsDB.Set("Mechanic", doc)
+	err := testsDB.Set("Mechanic", doc, nil)
 	if err != nil {
 		t.Error(`db set error`, err)
 	}
@@ -739,7 +739,7 @@ func TestDBDocIDsAndLen(t *testing.T) {
 		"name": "Jason Statham",
 	}
 
-	err := testsDB.Set("Mechanic", doc)
+	err := testsDB.Set("Mechanic", doc, nil)
 	if err != nil {
 		t.Error(`db set error`, err)
 	}

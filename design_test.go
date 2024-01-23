@@ -86,7 +86,7 @@ func TestViewMultiGet(t *testing.T) {
 				"map": "function(doc) { emit(doc.i, null); }",
 			},
 		},
-	})
+	}, nil)
 
 	results, err := designDB.View("test/multi_key", nil, map[string]interface{}{"keys": []int{1, 3, 5}})
 	if err != nil {
@@ -115,7 +115,7 @@ func TestDesignDocInfo(t *testing.T) {
 		"views": map[string]interface{}{
 			"test": map[string]string{"map": "function(doc) { emit(doc.type, null); }"},
 		},
-	})
+	}, nil)
 	info, _ := designDB.Info("test")
 	compactRunning := info["view_index"].(map[string]interface{})["compact_running"].(bool)
 	if compactRunning {
@@ -129,7 +129,7 @@ func TestViewCompaction(t *testing.T) {
 		"views": map[string]interface{}{
 			"multi_key": map[string]string{"map": "function(doc) { emit(doc.i, null); }"},
 		},
-	})
+	}, nil)
 
 	_, err := designDB.View("test/multi_key", nil, nil)
 	if err != nil {
@@ -147,7 +147,7 @@ func TestViewCleanup(t *testing.T) {
 		"views": map[string]interface{}{
 			"multi_key": map[string]string{"map": "function(doc) { emit(doc.i, null); }"},
 		},
-	})
+	}, nil)
 
 	_, err := designDB.View("test/multi_key", nil, nil)
 	if err != nil {
@@ -212,7 +212,7 @@ func TestViewWrapperFunction(t *testing.T) {
 }
 
 func TestUpdateSeq(t *testing.T) {
-	err := designDB.Set("foo", map[string]interface{}{})
+	err := designDB.Set("foo", map[string]interface{}{}, nil)
 	if err != nil {
 		t.Error("db set error", err)
 	}
